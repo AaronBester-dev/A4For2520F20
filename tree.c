@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tree.h"
+#include <string.h>
 
 struct Performance * newPerformance(){
     struct Performance * perf = malloc(sizeof(struct Performance));
@@ -15,13 +16,13 @@ void attachNode( struct Performance*performance, struct Node**node_ptr,void *src
     struct Node * newNode = malloc(sizeof(struct Node));
 
     if(newNode == NULL){
-        printf(stderr,"Can't allocate enough memory for a new node struct");
+        fprintf(stderr,"Can't allocate enough memory for a new node struct");
     }
 
     newNode->data = malloc(sizeof(unsigned char) * width);
 
     if(newNode->data == NULL){
-        printf(stderr,"Can't allocate enough memory for a new data struct");
+        fprintf(stderr,"Can't allocate enough memory for a new data struct");
     }
 
     memcpy(newNode->data,src,width);
@@ -42,7 +43,7 @@ struct Node**next( struct Performance *performance, struct Node**node_ptr, int d
     struct Node * currentNode = *node_ptr;
     struct Node ** nextNode = NULL;
     if(currentNode == NULL){
-         printf(stderr,"Tree is empty");
+         fprintf(stderr,"Tree is empty");
     }
 
     if(direction >= 0){
@@ -58,7 +59,7 @@ struct Node**next( struct Performance *performance, struct Node**node_ptr, int d
 void readNode( struct Performance *performance, struct Node **node_ptr, void *dest, unsigned int width ){
     struct Node * currentNode = *node_ptr;
     if(currentNode == NULL){
-        printf(stderr,"Tree is empty");
+        fprintf(stderr,"Tree is empty");
     }
 
     memcpy(dest,currentNode->data,width);
@@ -68,7 +69,7 @@ void readNode( struct Performance *performance, struct Node **node_ptr, void *de
 void detachNode(struct Performance *performance, struct Node**node_ptr){
     struct Node * nodeToBeFreed = *node_ptr;
     if(nodeToBeFreed == NULL){
-        printf(stderr,"Tree is empty");
+        fprintf(stderr,"Tree is empty");
     }
     free(nodeToBeFreed->data);
     free(nodeToBeFreed);
@@ -97,4 +98,9 @@ void addItem( struct Performance *performance, struct Node**node_ptr,int (*compa
 
 void freeTree( struct Performance *performance, struct Node**node_ptr){
     struct Node ** tempPtr = node_ptr;
+    if(isEmpty(performance,tempPtr) != 1){
+        freeTree(performance,next(performance,tempPtr,-1));
+        freeTree(performance,next(performance,tempPtr,1));
+        detachNode(performance,tempPtr);
+    }
 }
