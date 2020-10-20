@@ -13,4 +13,4 @@ ttest: ttest.o tree.o
 	$(CC) $(CFLAGS) ttest.o tree.o -o ttest
 
 clean:
-	rm -i tree.o
+	rm -i tree.o ttest.o ttest
