@@ -67,8 +67,34 @@ void readNode( struct Performance *performance, struct Node **node_ptr, void *de
 
 void detachNode(struct Performance *performance, struct Node**node_ptr){
     struct Node * nodeToBeFreed = *node_ptr;
-
+    if(nodeToBeFreed == NULL){
+        printf(stderr,"Tree is empty");
+    }
     free(nodeToBeFreed->data);
     free(nodeToBeFreed);
     *node_ptr = NULL;
+    performance->frees++;
+}
+
+int isEmpty(struct Performance * performance, struct Node ** node_ptr){
+    if(*node_ptr == NULL){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+void addItem( struct Performance *performance, struct Node**node_ptr,int (*compar)(const void *, const void *),void *src, unsigned int width ){
+    struct Node ** tempPtr = node_ptr;
+    int direction = 0;
+    while(isEmpty(performance,tempPtr) != 0){
+        direction = comparNode(performance,tempPtr,(*compar),src);
+        tempPtr = next(performance,tempPtr,direction);
+    }
+    attachNode(performance,tempPtr,src,width); 
+}
+
+void freeTree( struct Performance *performance, struct Node**node_ptr){
+    struct Node ** tempPtr = node_ptr;
 }
