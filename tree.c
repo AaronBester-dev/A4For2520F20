@@ -36,6 +36,7 @@ void attachNode( struct Performance*performance, struct Node**node_ptr,void *src
 
 int comparNode( struct Performance *performance, struct Node**node_ptr, int (*compar)(const void *, const void *),void *target){
     struct Node * currentNode = *node_ptr;
+    performance->reads++;
     return((*compar)(target,currentNode->data));
 }
 
@@ -46,12 +47,14 @@ struct Node**next( struct Performance *performance, struct Node**node_ptr, int d
          fprintf(stderr,"Tree is empty");
     }
    
+    performance->reads++;
+
     if(direction >= 0){
-        performance->reads++;
+        
         return(&(currentNode->gte));
     }
     else{
-        performance->reads++;
+      
         return(&(currentNode->lt));
     }
 }
@@ -108,17 +111,22 @@ void freeTree( struct Performance *performance, struct Node**node_ptr){
 
 int searchItem( struct Performance * performance, struct Node ** node_ptr,int (*compar)(const void *, const void *),void *target, unsigned int width ){
     struct Node ** tempPtr = node_ptr;
-    struct Node * nodePtr = *tempPtr;
     int direction = 0;
+    
     if(isEmpty(performance,tempPtr) != 1){
+       
         if((direction = comparNode(performance,tempPtr,(*compar),target)) == 0){
-            memcpy(target,nodePtr->data,width);
+            readNode(performance,tempPtr,target,width);
             return(1);
         }
-        searchItem(performance,next(performance,tempPtr,direction),(*compar),target,width);
+        else{
+            return(searchItem(performance,next(performance,tempPtr,direction),(*compar),target,width));
+        }
+        
     }
     else{
         return(0);
     }
-    return(0);
+    
+    
 }
